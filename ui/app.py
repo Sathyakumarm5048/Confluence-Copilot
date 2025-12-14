@@ -30,6 +30,17 @@ if "initialized" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+if "reset_chat" not in st.session_state:
+    st.session_state.reset_chat = False
+
+# ---------------------------------------------------------
+# Reset Chat Handling
+# ---------------------------------------------------------
+if st.session_state.reset_chat:
+    st.session_state.messages = []
+    st.session_state.reset_chat = False
+    st.success("✅ Chat history cleared. Start fresh!")
+
 # ---------------------------------------------------------
 # Display Chat History
 # ---------------------------------------------------------
@@ -62,8 +73,7 @@ if user_input:
     st.session_state.messages.append({"role": "assistant", "content": response})
 
 # ---------------------------------------------------------
-# Optional: Reset Chat
+# Reset Chat Button
 # ---------------------------------------------------------
 if st.button("Reset Chat"):
-    st.session_state.clear()
-    st.success("✅ Chat history cleared. Please reload the app manually.")
+    st.session_state.reset_chat = True
