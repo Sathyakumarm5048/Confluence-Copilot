@@ -144,8 +144,8 @@ if user_input:
         response = f"❌ Error: {str(e)}"
         st.error(f"Details: {str(e)}")
 
-    # Only render assistant message if response is valid
-    if response and response.strip():
+    # Validate response before rendering
+    if response and isinstance(response, str) and response.strip():
         st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="assistant-msg"><div>{response}</div></div>', unsafe_allow_html=True)
         st.session_state.messages.append({"role": "assistant", "content": response})
