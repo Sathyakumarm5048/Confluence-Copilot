@@ -130,24 +130,24 @@ st.markdown('</div>', unsafe_allow_html=True)
 user_input = st.chat_input("Ask a question about your Confluence space...")
 
 if user_input:
-    # Save user message
+    # Save and render user message
     st.session_state.messages.append({"role": "user", "content": user_input})
-
-    # Render user bubble
     st.markdown('<div class="speaker-label-left">You:</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="user-msg"><div>{user_input}</div></div>', unsafe_allow_html=True)
 
     # Generate assistant response
+    response = None
     try:
         with st.spinner("Thinking..."):
             response = answer_query(user_input)
     except Exception as e:
-        response = "❌ Something went wrong while processing your query. Please try again."
+        response = f"❌ Error: {str(e)}"
         st.error(f"Details: {str(e)}")
 
-    # Render assistant bubble
-    st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="assistant-msg"><div>{response}</div></div>', unsafe_allow_html=True)
-
-    # Save assistant message
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    # Only render assistant message if response is valid
+    if response and response.strip():
+        st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="assistant-msg"><div>{response}</div></div>', unsafe_allow_html=True)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+    else:
+        st.warning("⚠️ No response generated. Please try again.")
