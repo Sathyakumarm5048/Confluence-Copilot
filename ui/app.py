@@ -20,7 +20,7 @@ st.title("🤖 Confluence Copilot")
 st.caption("Your AI assistant for navigating Confluence knowledge.")
 
 # ---------------------------------------------------------
-# Initialization
+# Session State Initialization
 # ---------------------------------------------------------
 if "initialized" not in st.session_state:
     with st.spinner("Initializing Confluence Copilot..."):
@@ -30,16 +30,19 @@ if "initialized" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-if "reset_chat" not in st.session_state:
-    st.session_state.reset_chat = False
+if "chat_cleared" not in st.session_state:
+    st.session_state.chat_cleared = False
 
 # ---------------------------------------------------------
-# Reset Chat Handling
+# Reset Chat Button
 # ---------------------------------------------------------
 if st.button("Reset Chat"):
     st.session_state.messages = []
     st.session_state.chat_cleared = True
 
+# ---------------------------------------------------------
+# Show Confirmation Message
+# ---------------------------------------------------------
 if st.session_state.chat_cleared:
     st.success("✅ Chat history cleared. Start fresh!")
     st.session_state.chat_cleared = False
@@ -57,13 +60,11 @@ for msg in st.session_state.messages:
 user_input = st.chat_input("Ask a question about your Confluence space...")
 
 if user_input:
-    # Add user message
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    # Generate assistant response
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
@@ -72,11 +73,4 @@ if user_input:
                 response = f"❌ Error: {str(e)}"
             st.markdown(response)
 
-    # Save assistant response
     st.session_state.messages.append({"role": "assistant", "content": response})
-
-# ---------------------------------------------------------
-# Reset Chat Button
-# ---------------------------------------------------------
-if st.button("Reset Chat"):
-    st.session_state.reset_chat = True
