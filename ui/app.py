@@ -25,6 +25,7 @@ st.markdown("""
     background-color: #1e1e1e;
     padding: 20px;
     border-radius: 12px;
+    margin-top: 20px;
 }
 
 /* User message bubble */
@@ -48,7 +49,7 @@ st.markdown("""
     margin: 8px 0;
 }
 .assistant-msg > div {
-    background-color: #e6f0ff;
+    background-color: #dbeafe;
     color: #000;
     padding: 10px 14px;
     border-radius: 10px;
@@ -57,11 +58,19 @@ st.markdown("""
 }
 
 /* Speaker labels */
-.speaker-label {
+.speaker-label-left {
     font-weight: bold;
     font-size: 0.9rem;
     margin-bottom: 4px;
     color: #ccc;
+    text-align: left;
+}
+.speaker-label-right {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    color: #ccc;
+    text-align: right;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -107,10 +116,10 @@ for msg in st.session_state.messages:
     content = msg["content"]
 
     if role == "user":
-        st.markdown('<div class="speaker-label">You:</div>', unsafe_allow_html=True)
+        st.markdown('<div class="speaker-label-left">You:</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="user-msg"><div>{content}</div></div>', unsafe_allow_html=True)
     else:
-        st.markdown('<div class="speaker-label">Confluence Copilot:</div>', unsafe_allow_html=True)
+        st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="assistant-msg"><div>{content}</div></div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
@@ -125,19 +134,17 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     # Render user bubble
-    st.markdown('<div class="speaker-label">You:</div>', unsafe_allow_html=True)
+    st.markdown('<div class="speaker-label-left">You:</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="user-msg"><div>{user_input}</div></div>', unsafe_allow_html=True)
 
-    # Generate assistant response
     try:
         with st.spinner("Thinking..."):
-            response = answer_query(user_input)
+        response = answer_query(user_input)
     except Exception as e:
-        response = "❌ Something went wrong while processing your query. Please try again."
-        st.error(f"Details: {str(e)}")
+    response = "❌ Something went wrong while processing your query. Please try again."
+    st.error(f"Details: {str(e)}")
 
-    # Render assistant bubble
-    st.markdown('<div class="speaker-label">Confluence Copilot:</div>', unsafe_allow_html=True)
+    st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="assistant-msg"><div>{response}</div></div>', unsafe_allow_html=True)
 
     # Save assistant message
