@@ -36,10 +36,13 @@ if "reset_chat" not in st.session_state:
 # ---------------------------------------------------------
 # Reset Chat Handling
 # ---------------------------------------------------------
-if st.session_state.reset_chat:
+if st.button("Reset Chat"):
     st.session_state.messages = []
-    st.session_state.reset_chat = False
+    st.session_state.chat_cleared = True
+
+if st.session_state.chat_cleared:
     st.success("✅ Chat history cleared. Start fresh!")
+    st.session_state.chat_cleared = False
 
 # ---------------------------------------------------------
 # Display Chat History
