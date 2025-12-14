@@ -133,6 +133,7 @@ user_input = st.chat_input("Ask a question about your Confluence space...")
 if user_input:
     # Save user message
     st.session_state.messages.append({"role": "user", "content": user_input})
+    st.rerun()  # ✅ Immediately rerun so the user message appears
 
     # Generate assistant response
     try:
@@ -142,9 +143,9 @@ if user_input:
         response = f"❌ Error: {str(e)}"
         st.error(f"Details: {str(e)}")
 
-    # Save valid assistant response
+    # Save assistant message
     if response and isinstance(response, str) and response.strip() and response != "None":
         st.session_state.messages.append({"role": "assistant", "content": response})
-        st.rerun()  # ✅ triggers immediate UI update
+        st.rerun()  # ✅ Immediately rerun so the assistant message appears
     else:
         st.warning("⚠️ No response generated. Please try again.")
