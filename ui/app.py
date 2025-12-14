@@ -16,18 +16,26 @@ st.set_page_config(
     layout="wide"
 )
 
+# ---------------------------------------------------------
+# Custom Chat Bubble Styles
+# ---------------------------------------------------------
 st.markdown("""
 <style>
-.chat-left .stChatMessage {
+.user-msg {
     text-align: left;
+    background-color: #f7f7f7;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin: 6px 0;
+    max-width: 80%;
 }
 
-.chat-right .stChatMessage {
+.assistant-msg {
     text-align: right;
-    background-color: #f0f4ff;
+    background-color: #e6f0ff;
+    padding: 10px 14px;
     border-radius: 10px;
-    padding: 8px;
-    margin-left: auto;
+    margin: 6px 0 6px auto;
     max-width: 80%;
 }
 </style>
@@ -65,18 +73,16 @@ if st.session_state.chat_cleared:
     st.session_state.chat_cleared = False
 
 # ---------------------------------------------------------
-# Display Chat History
+# Display Chat History (Custom Bubbles)
 # ---------------------------------------------------------
 for msg in st.session_state.messages:
     role = msg["role"]
     content = msg["content"]
 
     if role == "user":
-        with st.chat_message("user"):
-            st.markdown(f'<div class="chat-left">{content}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="user-msg">{content}</div>', unsafe_allow_html=True)
     else:
-        with st.chat_message("assistant"):
-            st.markdown(f'<div class="chat-right">{content}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="assistant-msg">{content}</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # Chat Input
@@ -84,17 +90,21 @@ for msg in st.session_state.messages:
 user_input = st.chat_input("Ask a question about your Confluence space...")
 
 if user_input:
+    # Save user message
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    with st.chat_message("user"):
-        st.markdown(user_input)
+    # Render user bubble
+    st.markdown(f'<div class="user-msg">{user_input}</div>', unsafe_allow_html=True)
 
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            try:
-                response = answer_query(user_input)
-            except Exception as e:
-                response = f"❌ Error: {str(e)}"
-            st.markdown(response)
+    # Generate assistant response
+    with st.spinner("Thinking..."):
+        try:
+            response = answer_query(user_input)
+        except Exception as e:
+            response = f"❌ Error: {str(e)}"
 
+    # Render assistant bubble
+    st.markdown(f'<div class="assistant-msg">{response}</div>', unsafe_allow_html=True)
+
+    # Save assistant message
     st.session_state.messages.append({"role": "assistant", "content": response})
