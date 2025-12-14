@@ -16,6 +16,23 @@ st.set_page_config(
     layout="wide"
 )
 
+st.markdown("""
+<style>
+.chat-left .stChatMessage {
+    text-align: left;
+}
+
+.chat-right .stChatMessage {
+    text-align: right;
+    background-color: #f0f4ff;
+    border-radius: 10px;
+    padding: 8px;
+    margin-left: auto;
+    max-width: 80%;
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("🤖 Confluence Copilot")
 st.caption("Your AI assistant for navigating Confluence knowledge.")
 
@@ -51,8 +68,15 @@ if st.session_state.chat_cleared:
 # Display Chat History
 # ---------------------------------------------------------
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+    role = msg["role"]
+    content = msg["content"]
+
+    if role == "user":
+        with st.chat_message("user"):
+            st.markdown(f'<div class="chat-left">{content}</div>', unsafe_allow_html=True)
+    else:
+        with st.chat_message("assistant"):
+            st.markdown(f'<div class="chat-right">{content}</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # Chat Input
