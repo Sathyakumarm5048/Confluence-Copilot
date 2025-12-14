@@ -169,7 +169,7 @@ def get_page_link(page_data: dict, query: str) -> str:
 #  Chatbot Response
 # ---------------------------------------------------------
 def chatbot_response(query: str) -> str:
-    if pages is None or chunks is None or embedder is None or summarizer is None:
+    if any(v is None for v in [pages, chunks, embedder, summarizer]):
         return "System is still initializing. Please try again shortly."
 
     intent = detect_intent(query)
@@ -217,3 +217,5 @@ def startup():
 
     logger.info("Preprocessing content...")
     chunks = preprocess_content(pages)
+
+    logger.info("Startup completed successfully.")
