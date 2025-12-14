@@ -65,5 +65,6 @@ if user_input:
 # Optional: Reset Chat
 # ---------------------------------------------------------
 if st.button("Reset Chat"):
-    st.session_state.messages = []
+    st.warning("Chat history cleared. Restarting...")
+    st.session_state.clear()
     st.experimental_rerun()
