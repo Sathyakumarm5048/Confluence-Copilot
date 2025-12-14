@@ -4,7 +4,6 @@ import os
 
 # Ensure backend modules are discoverable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
-
 from main import answer_query, startup
 
 # ---------------------------------------------------------
@@ -89,6 +88,12 @@ if "initialized" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# ✅ Clean any previously saved empty messages
+st.session_state.messages = [
+    m for m in st.session_state.messages
+    if m.get("content") and str(m.get("content")).strip()
+]
+
 if "chat_cleared" not in st.session_state:
     st.session_state.chat_cleared = False
 
@@ -112,8 +117,12 @@ if st.session_state.chat_cleared:
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
 for msg in st.session_state.messages:
-    role = msg["role"]
-    content = msg["content"]
+    role = msg.get("role")
+    content = msg.get("content")
+
+    # ✅ Skip empty or invalid messages
+    if not content or not str(content).strip():
+        continue
 
     if role == "user":
         st.markdown('<div class="speaker-label-left">You:</div>', unsafe_allow_html=True)
@@ -144,7 +153,7 @@ if user_input:
         response = f"❌ Error: {str(e)}"
         st.error(f"Details: {str(e)}")
 
-    # Validate response before rendering
+    # ✅ Validate response before rendering or saving
     if response and isinstance(response, str) and response.strip():
         st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="assistant-msg"><div>{response}</div></div>', unsafe_allow_html=True)
