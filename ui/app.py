@@ -137,13 +137,15 @@ if user_input:
     st.markdown('<div class="speaker-label-left">You:</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="user-msg"><div>{user_input}</div></div>', unsafe_allow_html=True)
 
+    # Generate assistant response
     try:
         with st.spinner("Thinking..."):
-        response = answer_query(user_input)
+            response = answer_query(user_input)
     except Exception as e:
-    response = "❌ Something went wrong while processing your query. Please try again."
-    st.error(f"Details: {str(e)}")
+        response = "❌ Something went wrong while processing your query. Please try again."
+        st.error(f"Details: {str(e)}")
 
+    # Render assistant bubble
     st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="assistant-msg"><div>{response}</div></div>', unsafe_allow_html=True)
 
