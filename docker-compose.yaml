@@ -1,0 +1,12 @@
+services:
+  localai:
+    image: ghcr.io/go-skynet/localai:latest
+    container_name: local-ai
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models:/models
+    environment:
+      - MODELS_DIR=/models
+      - LOG_LEVEL=info
+    restart: unless-stopped

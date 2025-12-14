@@ -1,0 +1,12 @@
+models:
+  - name: sentence-transformers/all-MiniLM-L6-v2
+    backend: sentence-transformers
+    path: ./models/all-MiniLM-L6-v2
+    task: embedding
+    revision: main
+
+  - name: facebook/bart-large-cnn
+    backend: transformers
+    path: ./models/bart-large-cnn
+    task: summarization
+    revision: main
