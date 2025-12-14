@@ -65,6 +65,5 @@ if user_input:
 # Optional: Reset Chat
 # ---------------------------------------------------------
 if st.button("Reset Chat"):
-    st.warning("Chat history cleared. Restarting...")
     st.session_state.clear()
-    st.experimental_rerun()
+    st.success("✅ Chat history cleared. Please reload the app manually.")
