@@ -21,22 +21,29 @@ st.set_page_config(
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-.user-msg {
-    text-align: left;
+.user-msg, .assistant-msg {
+    display: flex;
+    margin: 8px 0;
+}
+
+.user-msg > div {
     background-color: #f7f7f7;
     padding: 10px 14px;
     border-radius: 10px;
-    margin: 6px 0;
     max-width: 80%;
+    text-align: left;
 }
 
 .assistant-msg {
-    text-align: right;
+    justify-content: flex-end;
+}
+
+.assistant-msg > div {
     background-color: #e6f0ff;
     padding: 10px 14px;
     border-radius: 10px;
-    margin: 6px 0 6px auto;
     max-width: 80%;
+    text-align: left;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -80,9 +87,9 @@ for msg in st.session_state.messages:
     content = msg["content"]
 
     if role == "user":
-        st.markdown(f'<div class="user-msg">{content}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="user-msg"><div>{content}</div></div>', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div class="assistant-msg">{content}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="assistant-msg"><div>{content}</div></div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # Chat Input
