@@ -198,9 +198,13 @@ def startup():
     email, token = get_credentials()
 
     logger.info("Loading embedding model...")
-    embedder = SentenceTransformer(
-        os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-    )
+
+    @st.cache_resource
+    def load_embedder():
+        model_name = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+        return SentenceTransformer(model_name, device="cpu", trust_remote_code=True)
+
+    embedder = load_embedder()
 
     logger.info("Loading summarizer model...")
     summarizer = pipeline(
