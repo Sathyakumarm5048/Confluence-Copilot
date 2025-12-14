@@ -21,9 +21,8 @@ st.set_page_config(
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-/* Chat container background */
 .chat-container {
-    background-color: #1e1e1e; /* dark mode base */
+    background-color: #1e1e1e;
     padding: 20px;
     border-radius: 12px;
 }
@@ -33,7 +32,6 @@ st.markdown("""
     display: flex;
     margin: 8px 0;
 }
-
 .user-msg > div {
     background-color: #f7f7f7;
     color: #000;
@@ -49,7 +47,6 @@ st.markdown("""
     justify-content: flex-end;
     margin: 8px 0;
 }
-
 .assistant-msg > div {
     background-color: #e6f0ff;
     color: #000;
@@ -101,7 +98,7 @@ if st.session_state.chat_cleared:
     st.session_state.chat_cleared = False
 
 # ---------------------------------------------------------
-# Display Chat History (Custom Bubbles)
+# Display Chat History
 # ---------------------------------------------------------
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
@@ -132,12 +129,12 @@ if user_input:
     st.markdown(f'<div class="user-msg"><div>{user_input}</div></div>', unsafe_allow_html=True)
 
     # Generate assistant response
-    with st.spinner("Thinking..."):
-        try:
+    try:
+        with st.spinner("Thinking..."):
             response = answer_query(user_input)
-        except Exception as e:
-            response = "❌ Something went wrong while processing your query. Please try again."
-    st.error(f"Details: {str(e)}")
+    except Exception as e:
+        response = "❌ Something went wrong while processing your query. Please try again."
+        st.error(f"Details: {str(e)}")
 
     # Render assistant bubble
     st.markdown('<div class="speaker-label">Confluence Copilot:</div>', unsafe_allow_html=True)
