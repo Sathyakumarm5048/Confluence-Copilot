@@ -145,6 +145,6 @@ if user_input:
     # Save valid assistant response
     if response and isinstance(response, str) and response.strip() and response != "None":
         st.session_state.messages.append({"role": "assistant", "content": response})
-        st.rerun()   # ✅ Critical fix: ensures UI updates immediately
+        st.rerun()  # ✅ triggers immediate UI update
     else:
         st.warning("⚠️ No response generated. Please try again.")
