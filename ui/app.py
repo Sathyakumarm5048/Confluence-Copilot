@@ -116,6 +116,8 @@ for msg in st.session_state.messages:
     elif role == "assistant":
         st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="assistant-msg"><div>{content}</div></div>', unsafe_allow_html=True)
+    else:
+        st.write(f"⚠️ Unknown role: {role}")
 
 st.markdown('</div>', unsafe_allow_html=True)
 
