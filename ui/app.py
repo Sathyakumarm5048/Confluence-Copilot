@@ -26,9 +26,7 @@ st.markdown("""
     border-radius: 12px;
     margin-top: 20px;
 }
-
-/* User message bubble */
-.user-msg {
+.user-msg, .assistant-msg {
     display: flex;
     margin: 8px 0;
 }
@@ -40,12 +38,8 @@ st.markdown("""
     max-width: 80%;
     text-align: left;
 }
-
-/* Assistant message bubble */
 .assistant-msg {
-    display: flex;
     justify-content: flex-end;
-    margin: 8px 0;
 }
 .assistant-msg > div {
     background-color: #dbeafe;
@@ -55,20 +49,16 @@ st.markdown("""
     max-width: 80%;
     text-align: left;
 }
-
-/* Speaker labels */
-.speaker-label-left {
+.speaker-label-left, .speaker-label-right {
     font-weight: bold;
     font-size: 0.9rem;
     margin-bottom: 4px;
     color: #ccc;
+}
+.speaker-label-left {
     text-align: left;
 }
 .speaker-label-right {
-    font-weight: bold;
-    font-size: 0.9rem;
-    margin-bottom: 4px;
-    color: #ccc;
     text-align: right;
 }
 </style>
@@ -88,7 +78,7 @@ if "initialized" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# ✅ Clean any previously saved empty messages
+# Clean any previously saved empty messages
 st.session_state.messages = [
     m for m in st.session_state.messages
     if m.get("content") and str(m.get("content")).strip()
@@ -104,9 +94,6 @@ if st.button("Reset Chat"):
     st.session_state.messages = []
     st.session_state.chat_cleared = True
 
-# ---------------------------------------------------------
-# Show Confirmation Message
-# ---------------------------------------------------------
 if st.session_state.chat_cleared:
     st.success("✅ Chat history cleared. Start fresh!")
     st.session_state.chat_cleared = False
@@ -120,14 +107,13 @@ for msg in st.session_state.messages:
     role = msg.get("role")
     content = msg.get("content")
 
-    # ✅ Skip empty or invalid messages
     if not content or not str(content).strip():
         continue
 
     if role == "user":
         st.markdown('<div class="speaker-label-left">You:</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="user-msg"><div>{content}</div></div>', unsafe_allow_html=True)
-    else:
+    elif role == "assistant":
         st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="assistant-msg"><div>{content}</div></div>', unsafe_allow_html=True)
 
@@ -139,10 +125,8 @@ st.markdown('</div>', unsafe_allow_html=True)
 user_input = st.chat_input("Ask a question about your Confluence space...")
 
 if user_input:
-    # Save and render user message
+    # Save user message
     st.session_state.messages.append({"role": "user", "content": user_input})
-    st.markdown('<div class="speaker-label-left">You:</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="user-msg"><div>{user_input}</div></div>', unsafe_allow_html=True)
 
     # Generate assistant response
     response = None
@@ -153,7 +137,7 @@ if user_input:
         response = f"❌ Error: {str(e)}"
         st.error(f"Details: {str(e)}")
 
-    # ✅ Save only valid assistant messages — no rendering here
+    # Save valid assistant response
     if response and isinstance(response, str) and response.strip():
         st.session_state.messages.append({"role": "assistant", "content": response})
     else:
