@@ -3,7 +3,6 @@ import sys
 import logging
 from typing import List
 import requests
-from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 import numpy as np
 import base64
@@ -12,8 +11,9 @@ from sentence_transformers import SentenceTransformer
 from transformers import pipeline
 import transformers
 import warnings
+import streamlit as st
 
-from auth_manager import get_credentials, reset_credentials
+from auth_manager import get_credentials
 
 # ---------------------------------------------------------
 #  Suppress unwanted logs/warnings/progress bars
@@ -23,21 +23,20 @@ transformers.logging.set_verbosity_error()
 os.environ["TRANSFORMERS_NO_TQDM"] = "1"
 
 # ---------------------------------------------------------
-#  Environment Setup
+#  Logging
 # ---------------------------------------------------------
-load_dotenv()
-
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("conf-hf")
+logger = logging.getLogger("conf-copilot")
 
 # ---------------------------------------------------------
 #  Confluence Configuration
 # ---------------------------------------------------------
-CONFLUENCE_BASE_URL = os.getenv(
-    "CONFLUENCE_BASE_URL",
+CONFLUENCE_BASE_URL = st.secrets.get(
+    "CONFLUENCE_URL",
     "https://revolution5048.atlassian.net/wiki"
 )
-DEFAULT_SPACE_KEY = os.getenv("CONFLUENCE_SPACE_KEY", "~satspc")
+
+DEFAULT_SPACE_KEY = st.secrets.get("CONFLUENCE_SPACE_KEY", "~satspc")
 
 # ---------------------------------------------------------
 #  Globals populated at runtime
@@ -170,8 +169,6 @@ def get_page_link(page_data: dict, query: str) -> str:
 #  Chatbot Response
 # ---------------------------------------------------------
 def chatbot_response(query: str) -> str:
-    global pages, chunks, embedder, summarizer
-
     if pages is None or chunks is None or embedder is None or summarizer is None:
         return "System is still initializing. Please try again shortly."
 
@@ -193,16 +190,12 @@ def answer_query(query: str) -> str:
     return chatbot_response(query)
 
 # ---------------------------------------------------------
-#  Startup (for CLI + Streamlit)
+#  Startup (Streamlit-safe)
 # ---------------------------------------------------------
 def startup():
     global email, token, embedder, summarizer, pages, chunks
 
-    creds = get_credentials()
-    if not creds:
-        raise RuntimeError("❌ Credential setup failed.")
-
-    email, token = creds
+    email, token = get_credentials()
 
     logger.info("Loading embedding model...")
     embedder = SentenceTransformer(
@@ -220,36 +213,3 @@ def startup():
 
     logger.info("Preprocessing content...")
     chunks = preprocess_content(pages)
-
-def stop_copilot():
-    import os, signal
-    os.kill(os.getpid(), signal.SIGTERM)
-
-# ---------------------------------------------------------
-#  CLI Mode
-# ---------------------------------------------------------
-if __name__ == "__main__":
-
-    try:
-        startup()
-    except Exception:
-        logger.exception("Error during setup")
-        sys.exit(1)
-
-    print("🤖 Chatbot ready. Type your question (or 'exit' to quit).")
-    print("🔧 Type 'reset' to re-enter your Confluence email + API token.")
-
-    while True:
-        user_query = input("\nYou: ").strip()
-
-        if user_query.lower() in {"reset", "reset credentials"}:
-            reset_credentials()
-            print("✅ Credentials cleared. Restart the program to enter new credentials.")
-            break
-
-        if user_query.lower() == "exit":
-            break
-
-        print("\nCopilot:", chatbot_response(user_query), "\n")
-
-    
