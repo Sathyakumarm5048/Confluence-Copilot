@@ -15,10 +15,6 @@ st.set_page_config(
     layout="wide"
 )
 
-if st.session_state.get("force_rerun"):
-    st.session_state.force_rerun = False
-    st.rerun()  # ✅ safe rerun after widget creation
-
 # ---------------------------------------------------------
 # Custom Chat Bubble Styles
 # ---------------------------------------------------------
@@ -59,12 +55,8 @@ st.markdown("""
     margin-bottom: 4px;
     color: #ccc;
 }
-.speaker-label-left {
-    text-align: left;
-}
-.speaker-label-right {
-    text-align: right;
-}
+.speaker-label-left { text-align: left; }
+.speaker-label-right { text-align: right; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -82,26 +74,19 @@ if "initialized" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Clean any previously saved empty messages
+# Clean empty messages
 st.session_state.messages = [
     m for m in st.session_state.messages
     if m.get("content") and str(m.get("content")).strip()
 ]
 
-if "chat_cleared" not in st.session_state:
-    st.session_state.chat_cleared = False
-
 # ---------------------------------------------------------
-# Reset Chat Button
+# Reset Chat
 # ---------------------------------------------------------
 if st.button("Reset Chat"):
     st.session_state.messages = []
-    st.session_state.chat_cleared = True
-    st.session_state.force_rerun = True  # ✅ set flag instead of rerunning here
-
-if st.session_state.chat_cleared:
     st.success("✅ Chat history cleared. Start fresh!")
-    st.session_state.chat_cleared = False
+    st.rerun()
 
 # ---------------------------------------------------------
 # Display Chat History
@@ -109,11 +94,8 @@ if st.session_state.chat_cleared:
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
 for msg in st.session_state.messages:
-    role = msg.get("role")
-    content = msg.get("content")
-
-    if not content or not str(content).strip():
-        continue
+    role = msg["role"]
+    content = msg["content"]
 
     if role == "user":
         st.markdown('<div class="speaker-label-left">You:</div>', unsafe_allow_html=True)
@@ -133,7 +115,6 @@ user_input = st.chat_input("Ask a question about your Confluence space...")
 if user_input:
     # Save user message
     st.session_state.messages.append({"role": "user", "content": user_input})
-    st.rerun()  # ✅ Immediately rerun so the user message appears
 
     # Generate assistant response
     try:
@@ -146,6 +127,8 @@ if user_input:
     # Save assistant message
     if response and isinstance(response, str) and response.strip() and response != "None":
         st.session_state.messages.append({"role": "assistant", "content": response})
-        st.rerun()  # ✅ Immediately rerun so the assistant message appears
     else:
         st.warning("⚠️ No response generated. Please try again.")
+
+    # ✅ Rerun once AFTER both messages are saved
+    st.rerun()
