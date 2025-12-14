@@ -195,27 +195,54 @@ def answer_query(query: str) -> str:
 def startup():
     global email, token, embedder, summarizer, pages, chunks
 
-    email, token = get_credentials()
+    logger.info("STARTUP: entered startup()")
 
-    logger.info("Loading embedding model...")
+    try:
+        email, token = get_credentials()
+        logger.info("STARTUP: credentials loaded")
+    except Exception as e:
+        logger.error("STARTUP FAILED at credentials: %s", e)
+        return
 
-    @st.cache_resource
-    def load_embedder():
-        model_name = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-        return SentenceTransformer(model_name, device="cpu", trust_remote_code=True)
+    try:
+        logger.info("STARTUP: loading embedder...")
 
-    embedder = load_embedder()
+        @st.cache_resource
+        def load_embedder():
+            model_name = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+            return SentenceTransformer(model_name, device="cpu", trust_remote_code=True)
 
-    logger.info("Loading summarizer model...")
-    summarizer = pipeline(
-        "summarization",
-        model=os.getenv("SUMMARIZER_MODEL", "facebook/bart-large-cnn")
-    )
+        embedder = load_embedder()
+        logger.info("STARTUP: embedder loaded")
+    except Exception as e:
+        logger.error("STARTUP FAILED at embedder: %s", e)
+        return
 
-    logger.info("Loading Confluence pages...")
-    pages = fetch_pages()
+    try:
+        logger.info("STARTUP: loading summarizer...")
+        summarizer = pipeline(
+            "summarization",
+            model=os.getenv("SUMMARIZER_MODEL", "facebook/bart-large-cnn")
+        )
+        logger.info("STARTUP: summarizer loaded")
+    except Exception as e:
+        logger.error("STARTUP FAILED at summarizer: %s", e)
+        return
 
-    logger.info("Preprocessing content...")
-    chunks = preprocess_content(pages)
+    try:
+        logger.info("STARTUP: fetching pages...")
+        pages = fetch_pages()
+        logger.info("STARTUP: pages fetched")
+    except Exception as e:
+        logger.error("STARTUP FAILED at fetch_pages: %s", e)
+        return
 
-    logger.info("Startup completed successfully.")
+    try:
+        logger.info("STARTUP: preprocessing content...")
+        chunks = preprocess_content(pages)
+        logger.info("STARTUP: preprocessing complete")
+    except Exception as e:
+        logger.error("STARTUP FAILED at preprocess_content: %s", e)
+        return
+
+    logger.info("STARTUP: completed successfully")
