@@ -187,7 +187,10 @@ def chatbot_response(query: str) -> str:
         return "An error occurred while processing your query."
 
 def answer_query(query: str) -> str:
-    return chatbot_response(query)
+    logger.info(f"answer_query received: {query}")
+    result = chatbot_response(query)
+    logger.info(f"answer_query returned: {repr(result)}")
+    return result
 
 # ---------------------------------------------------------
 #  Startup (Streamlit-safe)
