@@ -15,6 +15,10 @@ st.set_page_config(
     layout="wide"
 )
 
+if st.session_state.get("force_rerun"):
+    st.session_state.force_rerun = False
+    st.experimental_rerun()  # ✅ safe rerun after widget creation
+
 # ---------------------------------------------------------
 # Custom Chat Bubble Styles
 # ---------------------------------------------------------
@@ -93,7 +97,7 @@ if "chat_cleared" not in st.session_state:
 if st.button("Reset Chat"):
     st.session_state.messages = []
     st.session_state.chat_cleared = True
-    st.experimental_rerun()
+    st.session_state.force_rerun = True  # ✅ set flag instead of rerunning here
 
 if st.session_state.chat_cleared:
     st.success("✅ Chat history cleared. Start fresh!")
