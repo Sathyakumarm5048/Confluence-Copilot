@@ -93,6 +93,7 @@ if "chat_cleared" not in st.session_state:
 if st.button("Reset Chat"):
     st.session_state.messages = []
     st.session_state.chat_cleared = True
+    st.experimental_rerun()
 
 if st.session_state.chat_cleared:
     st.success("✅ Chat history cleared. Start fresh!")
@@ -113,11 +114,10 @@ for msg in st.session_state.messages:
     if role == "user":
         st.markdown('<div class="speaker-label-left">You:</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="user-msg"><div>{content}</div></div>', unsafe_allow_html=True)
+
     elif role == "assistant":
         st.markdown('<div class="speaker-label-right">Confluence Copilot:</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="assistant-msg"><div>{content}</div></div>', unsafe_allow_html=True)
-    else:
-        st.write(f"⚠️ Unknown role: {role}")
 
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -131,7 +131,6 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     # Generate assistant response
-    response = None
     try:
         with st.spinner("Thinking..."):
             response = answer_query(user_input)
@@ -140,7 +139,8 @@ if user_input:
         st.error(f"Details: {str(e)}")
 
     # Save valid assistant response
-    if response and isinstance(response, str) and response.strip():
+    if response and isinstance(response, str) and response.strip() and response != "None":
         st.session_state.messages.append({"role": "assistant", "content": response})
+        st.experimental_rerun()   # ✅ Critical fix: ensures UI updates immediately
     else:
         st.warning("⚠️ No response generated. Please try again.")
