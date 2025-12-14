@@ -17,7 +17,7 @@ st.set_page_config(
 
 if st.session_state.get("force_rerun"):
     st.session_state.force_rerun = False
-    st.experimental_rerun()  # ✅ safe rerun after widget creation
+    st.rerun()  # ✅ safe rerun after widget creation
 
 # ---------------------------------------------------------
 # Custom Chat Bubble Styles
@@ -145,6 +145,6 @@ if user_input:
     # Save valid assistant response
     if response and isinstance(response, str) and response.strip() and response != "None":
         st.session_state.messages.append({"role": "assistant", "content": response})
-        st.experimental_rerun()   # ✅ Critical fix: ensures UI updates immediately
+        st.rerun()   # ✅ Critical fix: ensures UI updates immediately
     else:
         st.warning("⚠️ No response generated. Please try again.")
