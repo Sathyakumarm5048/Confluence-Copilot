@@ -116,19 +116,30 @@ if user_input:
     # Save user message
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    # Generate assistant response
-    try:
-        with st.spinner("Thinking..."):
-            response = answer_query(user_input)
-    except Exception as e:
-        response = f"❌ Error: {str(e)}"
-        st.error(f"Details: {str(e)}")
-
-    # Save assistant message
-    if response and isinstance(response, str) and response.strip() and response != "None":
-        st.session_state.messages.append({"role": "assistant", "content": response})
-    else:
-        st.warning("⚠️ No response generated. Please try again.")
-
-    # ✅ Rerun once AFTER both messages are saved
+    # Save temporary assistant placeholder
+    st.session_state.messages.append({"role": "assistant", "content": "Thinking..."})
     st.rerun()
+
+# ---------------------------------------------------------
+# Replace "Thinking..." with actual response
+# ---------------------------------------------------------
+if st.session_state.messages:
+    last_msg = st.session_state.messages[-1]
+    second_last = st.session_state.messages[-2] if len(st.session_state.messages) >= 2 else {}
+
+    if last_msg.get("role") == "assistant" and last_msg.get("content") == "Thinking..." and second_last.get("role") == "user":
+        query = second_last.get("content")
+        try:
+            with st.spinner("Confluence Copilot is thinking..."):
+                response = answer_query(query)
+        except Exception as e:
+            response = f"❌ Error: {str(e)}"
+            st.error(f"Details: {str(e)}")
+
+        # Replace placeholder with actual response
+        if response and isinstance(response, str) and response.strip() and response != "None":
+            st.session_state.messages[-1]["content"] = response
+        else:
+            st.session_state.messages[-1]["content"] = "⚠️ No response generated. Please try again."
+
+        st.rerun()
