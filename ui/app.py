@@ -31,7 +31,7 @@ st.markdown("""
     margin: 8px 0;
 }
 .user-msg > div {
-    background-color: #f7f7f7;
+    background-color: #ffa500; /* Orange for user prompt */
     color: #000;
     padding: 10px 14px;
     border-radius: 10px;
@@ -42,8 +42,8 @@ st.markdown("""
     justify-content: flex-end;
 }
 .assistant-msg > div {
-    background-color: #dbeafe;
-    color: #000;
+    background-color: #ff4d4d; /* Red for assistant response */
+    color: #fff; /* White text for contrast */
     padding: 10px 14px;
     border-radius: 10px;
     max-width: 80%;
