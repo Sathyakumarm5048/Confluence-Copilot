@@ -20,12 +20,7 @@ st.set_page_config(
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-.chat-container {
-    
-    padding: 20px;
-    border-radius: 12px;
-    margin-top: 20px;
-}
+
 .user-msg, .assistant-msg {
     display: flex;
     margin: 8px 0;
