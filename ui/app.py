@@ -110,31 +110,30 @@ user_input = st.chat_input("Ask a question about your Confluence space...")
 if user_input:
     # Save user message
     st.session_state.messages.append({"role": "user", "content": user_input})
-
-    # Save temporary assistant placeholder
-    st.session_state.messages.append({"role": "assistant", "content": "Thinking..."})
+    st.session_state.pending_query = user_input  # ✅ Store query separately
     st.rerun()
 
 # ---------------------------------------------------------
-# Replace "Thinking..." with actual response
+# Generate Assistant Response if pending
 # ---------------------------------------------------------
-if st.session_state.messages:
-    last_msg = st.session_state.messages[-1]
-    second_last = st.session_state.messages[-2] if len(st.session_state.messages) >= 2 else {}
+if "pending_query" in st.session_state:
+    query = st.session_state.pending_query
 
-    if last_msg.get("role") == "assistant" and last_msg.get("content") == "Thinking..." and second_last.get("role") == "user":
-        query = second_last.get("content")
-        try:
-            with st.spinner("Confluence Copilot is thinking..."):
-                response = answer_query(query)
-        except Exception as e:
-            response = f"❌ Error: {str(e)}"
-            st.error(f"Details: {str(e)}")
+    # ✅ Show loading message outside chat bubbles
+    st.info("🤖 Confluence Copilot is thinking...")
 
-        # Replace placeholder with actual response
-        if response and isinstance(response, str) and response.strip() and response != "None":
-            st.session_state.messages[-1]["content"] = response
-        else:
-            st.session_state.messages[-1]["content"] = "⚠️ No response generated. Please try again."
+    try:
+        with st.spinner("Thinking..."):
+            response = answer_query(query)
+    except Exception as e:
+        response = f"❌ Error: {str(e)}"
+        st.error(f"Details: {str(e)}")
 
-        st.rerun()
+    # Save assistant response
+    if response and isinstance(response, str) and response.strip() and response != "None":
+        st.session_state.messages.append({"role": "assistant", "content": response})
+    else:
+        st.session_state.messages.append({"role": "assistant", "content": "⚠️ No response generated. Please try again."})
+
+    del st.session_state.pending_query  # ✅ Clear pending query
+    st.rerun()
