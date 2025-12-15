@@ -21,7 +21,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 .chat-container {
-    background-color: #fdfbf9;
+    
     padding: 20px;
     border-radius: 12px;
     margin-top: 20px;
